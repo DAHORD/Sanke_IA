@@ -57,12 +57,12 @@ L’IA joue indéfiniment jusqu’à interruption manuelle.
 
 - **Syntaxe** :
     ```bash
-    python games_pkl_ia.py [start] [end]
+    python games_pkl_ia.py --start n1 --end n2
     ```
-    - `start` et `end` : indices des parties à visualiser (optionnels).  
+    - `n1` et `n2` : indices des parties à visualiser (optionnels).  
     - Exemple pour afficher les parties 10 à 20 :
         ```bash
-        python games_pkl_ia.py 10 20
+        python games_pkl_ia.py --start 10 --end 20
         ```
     - Si aucun paramètre n'est renseigné, toutes les parties sont affichées.
 
