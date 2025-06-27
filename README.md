@@ -4,20 +4,16 @@ Jeu Snake en Python avec Intelligence Artificielle basée sur le Q-Learning.
 
 ## Présentation
 
-Ce projet propose deux modes :
-- **Mode Classique** : Jouer au Snake avec les flèches du clavier.
-- **Mode IA** : Une IA apprend à jouer au Snake grâce à l’algorithme de Q-Learning.
+Ce projet propose plusieurs modes autour du jeu Snake :
+- **Mode Classique** : Jouez au Snake avec les flèches du clavier.
+- **Mode IA** : Une IA apprend à jouer grâce à l’algorithme de Q-Learning et joue de façon autonome.
+- **Lecture et visualisation des parties sauvegardées** :
+  - `games_pkl_ia.py` permet de lire une table `.pkl` de parties sauvegardées, avec la possibilité de définir un intervalle de parties à afficher via des paramètres en ligne de commande.
+  - `graphic_pkl_ia.py` permet de visualiser graphiquement les parties sauvegardées dans le fichier `.pkl`.
 
 L’interface graphique est réalisée avec [Pygame](https://www.pygame.org/).
+
 L’IA fonctionne sur des parties enregistrées dans une table `.pkl` (pickle Python).
-
----
-
-## Nouveautés
-
-- **Lecture et visualisation des parties enregistrées** :
-  - `games_pkl_ia.py` permet de lire une table `.pkl` de parties sauvegardées, avec la possibilité de choisir un intervalle de parties à afficher via des paramètres en ligne de commande.
-  - `graphic_pkl_ia.py` permet également de visualiser les parties sauvegardées de façon graphique.
 
 ---
 
@@ -43,11 +39,17 @@ L’IA fonctionne sur des parties enregistrées dans une table `.pkl` (pickle Py
 python main_game.py
 ```
 
-### Lancer l’IA sur un nombre de parties
+### Lancer l’IA sur un nombre de parties défini
 ```bash
 python main_nb.py
 ```
 Le nombre de parties est défini dans `settings.py` (variable `TOTAL_GAMES_TO_TRAIN`).
+
+### Lancer l’IA en boucle continue
+```bash
+python main_while.py
+```
+L’IA joue indéfiniment jusqu’à interruption manuelle.
 
 ### Visualiser des parties sauvegardées
 
@@ -57,7 +59,7 @@ Le nombre de parties est défini dans `settings.py` (variable `TOTAL_GAMES_TO_TR
     ```bash
     python games_pkl_ia.py [start] [end]
     ```
-    - `start` et `end` : indices des parties à visualiser (optionnels).
+    - `start` et `end` : indices des parties à visualiser (optionnels).  
     - Exemple pour afficher les parties 10 à 20 :
         ```bash
         python games_pkl_ia.py 10 20
@@ -81,8 +83,8 @@ Sanke_IA/
 ├── main_nb.py
 ├── main_while.py
 ├── agent.py
-├── games_pkl_ia.py         # NOUVEAU : lecture/filtrage des parties .pkl
-├── graphic_pkl_ia.py       # NOUVEAU : visualisation graphique des parties .pkl
+├── games_pkl_ia.py
+├── graphic_pkl_ia.py
 ├── game_objects.py
 ├── plotter.py
 ├── settings.py
@@ -96,8 +98,8 @@ Sanke_IA/
 
 ## Personnalisation
 
-- Change les couleurs, la vitesse ou la taille du plateau dans `settings.py`.
-- Améliore l’IA ou crée tes propres environnements !
+- Changez les couleurs, la vitesse ou la taille du plateau dans `settings.py`.
+- Améliorez l’IA ou créez vos propres environnements !
 
 ---
 
