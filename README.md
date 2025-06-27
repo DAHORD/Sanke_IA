@@ -31,7 +31,6 @@ L’IA peut être entraînée sur un nombre défini de parties.
    ```bash
    pip install -r requirements.txt
    ```
-   *(À adapter selon ton fichier requirements.txt ou simplement : `pip install pygame numpy matplotlib`)*
 
 ---
 
@@ -94,4 +93,4 @@ python main_while.py
 
 ## Licence
 
-Ce projet est sous licence MIT – voir [LICENSE](LICENSE) pour plus d’informations.
+Ce projet est sous licence Apache 2.0 – voir [LICENSE](LICENSE) pour plus d’informations.
