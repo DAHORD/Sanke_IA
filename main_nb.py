@@ -92,7 +92,6 @@ def train():
     game = SnakeGameAI()
     plotter = Plotter()
     
-    # MODIFICATION : On remplace "while True" par une condition sur le nombre de parties
     while agent.n_games < TOTAL_GAMES_TO_TRAIN:
         state_old = agent.get_state(game)
         final_move = agent.get_action(state_old)
@@ -113,16 +112,15 @@ def train():
             print(f'Partie {agent.n_games}/{TOTAL_GAMES_TO_TRAIN}, Score: {score}, Record: {record}')
             plotter.plot(score)
     
-    # AJOUT : Code pour terminer proprement après la boucle
-    print("Entraînement terminé !")
+    # Sauvegarde le modèle final à la toute fin
+    print("Entraînement terminé ! Sauvegarde du modèle final...")
+    agent.save_model()
+    
     pygame.quit() # Ferme la fenêtre Pygame
     
-    # Garde le graphique final affiché jusqu'à ce que vous le fermiez manuellement
     import matplotlib.pyplot as plt
     plt.ioff()
     plt.show()
 
 if __name__ == '__main__':
-    # On importe la nouvelle constante depuis les settings
-    from settings import TOTAL_GAMES_TO_TRAIN 
     train()

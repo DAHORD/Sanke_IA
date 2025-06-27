@@ -1,5 +1,3 @@
-# snake_project/game_objects.py
-
 import pygame
 import random
 from settings import *
@@ -36,27 +34,38 @@ class Snake:
         return self.body[0] in self.body[1:]
 
     def draw(self, surface):
-        head = self.body[0]
-        pygame.draw.rect(surface, SNAKE_HEAD_COLOR, head, border_radius=7)
-        for segment in self.body[1:]:
-            pygame.draw.rect(surface, SNAKE_BODY_COLOR, segment, border_radius=5)
+        # Effet de dégradé sur le corps
+        n = len(self.body)
+        for i, segment in enumerate(self.body):
+            if i == 0:
+                color = SNAKE_HEAD_COLOR
+                shadow_rect = segment.copy()
+                shadow_rect.move_ip(3, 3)
+                pygame.draw.rect(surface, (30, 30, 30, 60), shadow_rect, border_radius=7)
+                pygame.draw.rect(surface, color, segment, border_radius=7)
+            else:
+                fade = int(200 - 120 * (i / n))
+                color = (SNAKE_BODY_COLOR[0], SNAKE_BODY_COLOR[1], SNAKE_BODY_COLOR[2], fade)
+                pygame.draw.rect(surface, SNAKE_BODY_COLOR, segment, border_radius=5)
         self._draw_eyes(surface)
 
     def _draw_eyes(self, surface):
         head = self.body[0]
-        eye_size = 3
+        eye_size = 4
+        offset = 6
+        # Yeux plus gros et plus visibles
         if self.direction == pygame.math.Vector2(1, 0):
-            eye1_pos = (head.right - eye_size * 2, head.top + eye_size * 2)
-            eye2_pos = (head.right - eye_size * 2, head.bottom - eye_size * 2)
+            eye1_pos = (head.right - offset, head.top + offset)
+            eye2_pos = (head.right - offset, head.bottom - offset)
         elif self.direction == pygame.math.Vector2(-1, 0):
-            eye1_pos = (head.left + eye_size, head.top + eye_size * 2)
-            eye2_pos = (head.left + eye_size, head.bottom - eye_size * 2)
+            eye1_pos = (head.left + offset, head.top + offset)
+            eye2_pos = (head.left + offset, head.bottom - offset)
         elif self.direction == pygame.math.Vector2(0, 1):
-            eye1_pos = (head.left + eye_size * 2, head.bottom - eye_size * 2)
-            eye2_pos = (head.right - eye_size, head.bottom - eye_size * 2)
-        else: # Vector2(0, -1)
-            eye1_pos = (head.left + eye_size * 2, head.top + eye_size)
-            eye2_pos = (head.right - eye_size, head.top + eye_size)
+            eye1_pos = (head.left + offset, head.bottom - offset)
+            eye2_pos = (head.right - offset, head.bottom - offset)
+        else: # up
+            eye1_pos = (head.left + offset, head.top + offset)
+            eye2_pos = (head.right - offset, head.top + offset)
         pygame.draw.circle(surface, EYE_COLOR, eye1_pos, eye_size)
         pygame.draw.circle(surface, EYE_COLOR, eye2_pos, eye_size)
 
@@ -76,4 +85,8 @@ class Food:
                 break
 
     def draw(self, surface):
+        # Effet glow derrière la pomme
+        glow = pygame.Surface((BLOCK_SIZE*2, BLOCK_SIZE*2), pygame.SRCALPHA)
+        pygame.draw.circle(glow, (255, 80, 80, 90), (BLOCK_SIZE, BLOCK_SIZE), BLOCK_SIZE)
+        surface.blit(glow, (self.pos.x - BLOCK_SIZE//2, self.pos.y - BLOCK_SIZE//2))
         surface.blit(self.image, self.pos)

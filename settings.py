@@ -3,7 +3,7 @@
 # -- Chemins des ressources --
 FONT_PATH = 'assets/font.ttf'
 FOOD_IMAGE_PATH = 'assets/apple.png'
-MODEL_PATH = 'model/q_table_1k.pkl'
+MODEL_PATH = 'model/q_table_5.pkl'
 
 # -- Dimensions de la fenêtre --
 SCREEN_WIDTH = 800
@@ -28,4 +28,4 @@ LEARNING_RATE = 0.001
 DISCOUNT_FACTOR = 0.9
 
 # NOUVEAU PARAMÈTRE
-TOTAL_GAMES_TO_TRAIN = 1000
+TOTAL_GAMES_TO_TRAIN = 5
