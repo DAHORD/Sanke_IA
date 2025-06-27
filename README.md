@@ -41,8 +41,7 @@
 │   ├── plotter.py         # Affichage dynamique des scores pendant l'entraînement
 │   └── settings.py        # Paramètres globaux (jeu, IA, chemins)
 ├── requirements.txt       # Dépendances Python
-├── LICENSE                # Licence Apache 2.0
-└── .gitignore
+└── ...
 ```
 > **NB :** Le dossier `model` est indispensable pour le bon fonctionnement de l’IA.
 
