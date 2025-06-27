@@ -89,12 +89,14 @@ python snake_ia/main_nb.py
 ```
 - L’IA s’entraîne sur le nombre de parties défini.
 - Les scores et le modèle sont sauvegardés dans `model/`.
+- Même avec arrêt manuel, via la croix de la fenêtre ou Ctrl+C, le model se sauvegarde.
 
 #### b) En boucle infinie (arrêt manuel)
 ```sh
 python snake_ia/main_while.py
 ```
 - Arrêtez l’entraînement via la croix de la fenêtre ou Ctrl+C.
+- Sauvegare auto à l'arrêt.
 
 ---
 
@@ -156,7 +158,7 @@ Projet sous licence [Apache 2.0](LICENSE).
 
 - Les modèles IA sont sauvegardés dans [`model/`](model/).
 - Pour toute question, suggestion ou amélioration, ouvrez un ticket (issue) ou une pull request.
-- Toute contribution est la bienvenue afin d’améliorer ce projet open source.
+- Toute contribution est la bienvenue afin d’améliorer ce projet.
 
 ---
 
