@@ -1,4 +1,5 @@
 # dossiers ignorées
+snake_ia/__pycache__/*
 __pycache__/*
 model/*
 .vscode/*

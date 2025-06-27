@@ -8,6 +8,9 @@ from game_objects import Snake, Food
 from agent import Agent
 from plotter import Plotter
 
+class QuitTraining(Exception):
+    pass
+
 class SnakeGameAI:
     def __init__(self):
         pygame.init()
@@ -29,24 +32,35 @@ class SnakeGameAI:
     def play_step(self, action):
         self.frame_iteration += 1
         for event in pygame.event.get():
+            # MODIFIÉ : On ne quitte plus brutalement. On lève notre exception.
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                raise QuitTraining()
         
+        distance_avant = pygame.math.Vector2(self.snake.body[0].center).distance_to(self.food.pos.center)
+
         self._move(action)
         self.snake.move()
         
+        distance_apres = pygame.math.Vector2(self.snake.body[0].center).distance_to(self.food.pos.center)
+        
         game_over = False
         reward = 0
-        if self.frame_iteration > 100 * (len(self.snake.body) + 1):
+        
+        if distance_apres < distance_avant:
+            reward = 0.1
+        else:
+            reward = -0.2
+
+        if self.frame_iteration > 150 * (len(self.snake.body)):
             game_over = True
             reward = -10
         
         if self.snake.body[0].colliderect(self.food.pos):
             self.score += 1
-            reward = 10
+            reward = 10 
             self.snake.grow_snake()
             self.food.randomize_position(self.snake.body)
+            self.frame_iteration = 0
         
         if self._is_collision():
             game_over = True
@@ -91,25 +105,42 @@ def train():
     game = SnakeGameAI()
     plotter = Plotter()
 
-    while True:
-        state_old = agent.get_state(game)
-        final_move = agent.get_action(state_old)
-        reward, done, score = game.play_step(final_move)
-        state_new = agent.get_state(game)
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
-        agent.remember(state_old, final_move, reward, state_new, done)
-        
-        if done:
-            game.reset()
-            agent.n_games += 1
-            agent.train_long_memory()
+    try:
+        while True:
+            state_old = agent.get_state(game)
+            final_move = agent.get_action(state_old)
+            reward, done, score = game.play_step(final_move)
+            state_new = agent.get_state(game)
+            agent.train_short_memory(state_old, final_move, reward, state_new, done)
+            agent.remember(state_old, final_move, reward, state_new, done)
             
-            if score > record:
-                record = score
-                agent.save_model()
-            
-            print(f'Partie {agent.n_games}, Score: {score}, Record: {record}')
-            plotter.plot(score)
+            if done:
+                game.reset()
+                agent.n_games += 1
+                agent.train_long_memory()
+                
+                if score > record:
+                    record = score
+                    # La sauvegarde est toujours faite en cas de record
+                    agent.save_model()
+                
+                print(f'Partie {agent.n_games}, Score: {score}, Record: {record}, Epsilon: {agent.epsilon:.2f}')
+                plotter.plot(score)
+    
+    except QuitTraining:
+        print("\nArrêt manuel détecté. Fin de l'entraînement.")
+    
+    finally:
+        # Ce bloc s'exécute TOUJOURS : à la fin normale ou en cas d'arrêt manuel.
+        print("Sauvegarde finale du modèle en cours...")
+        agent.save_model()
+        pygame.quit()
+        print("Modèle sauvegardé. Programme terminé.")
+
+        # Garde le graphique final affiché
+        import matplotlib.pyplot as plt
+        plt.ioff()
+        plt.show()
 
 if __name__ == '__main__':
     train()

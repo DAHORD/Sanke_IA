@@ -4,8 +4,8 @@ import random
 import numpy as np
 import pickle
 import os
+import pygame
 from collections import deque
-# Importations corrigées et complètes
 from settings import (BLOCK_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, MAX_MEMORY, 
                       BATCH_SIZE, LEARNING_RATE, DISCOUNT_FACTOR, MODEL_PATH)
 
@@ -14,7 +14,7 @@ class Agent:
         self.n_games = 0
         self.memory = deque(maxlen=MAX_MEMORY)
         self.gamma = DISCOUNT_FACTOR
-        self.epsilon = 0
+        self.epsilon = 1.0 # Epsilon commence à 100%
         self.q_table = {}
         if load_model:
             self.load_model()
@@ -54,10 +54,8 @@ class Agent:
         return tuple(state)
 
     def _is_collision(self, pt, snake_body):
-        # Utilise les constantes importées de settings.py
         if pt[0] >= SCREEN_WIDTH or pt[0] < 0 or pt[1] >= SCREEN_HEIGHT or pt[1] < 0:
             return True
-        # Crée un Rect temporaire pour le point à tester
         test_rect = pygame.Rect(pt[0], pt[1], BLOCK_SIZE, BLOCK_SIZE)
         if any(segment.colliderect(test_rect) for segment in snake_body):
             return True
@@ -86,13 +84,20 @@ class Agent:
         self.q_table[state] = tuple(q_values)
 
     def get_action(self, state):
-        self.epsilon = 80 - self.n_games
+        # --- STRATÉGIE D'EPSILON AMÉLIORÉE ---
+        # Epsilon va maintenant décroître plus lentement, avec un minimum.
+        # Après 500 parties, le taux d'exploration sera d'environ 5%.
+        # Vous pouvez ajuster le "500" pour une exploration plus ou moins longue.
+        exploration_rate = 1 - (self.n_games / 500)
+        self.epsilon = max(0.05, exploration_rate) # Taux d'exploration minimum de 5%
+
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
-            move_index = random.randint(0, 2)
+        if random.uniform(0, 1) < self.epsilon:
+            move_index = random.randint(0, 2) # Action aléatoire (exploration)
         else:
             q_values = self.q_table.get(state, [0, 0, 0])
-            move_index = np.argmax(q_values)
+            move_index = np.argmax(q_values) # Meilleure action connue (exploitation)
+        
         final_move[move_index] = 1
         return final_move
         
@@ -107,6 +112,3 @@ class Agent:
                 self.n_games = data['n_games']
                 self.q_table = data['q_table']
                 print(f"Modèle chargé : {self.n_games} parties déjà jouées.")
-
-# Il faut importer pygame ici pour que la classe Agent puisse l'utiliser sans planter
-import pygame
