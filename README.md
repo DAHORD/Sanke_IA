@@ -64,15 +64,21 @@ python main_while.py
 
 ```
 .
-├── main_game.py      # Jeu Snake classique
-├── main_nb.py        # Entraînement IA sur un nombre défini de parties
-├── main_while.py     # Entraînement IA en boucle infinie
-├── agent.py          # Agent IA/Q-Learning
-├── game_objects.py   # Logique du Snake et de la nourriture
-├── settings.py       # Paramètres (taille, vitesse, couleurs, chemins…)
-├── plotter.py        # Affichage des courbes d’apprentissage
-├── assets/           # Images, polices, etc.
-└── README.md
+Sanke_IA/
+├── sanke_ia/
+│   ├── __init__.py
+│   ├── main_game.py
+│   ├── main_nb.py
+│   ├── main_while.py
+│   ├── agent.py
+│   ├── game_objects.py
+│   ├── plotter.py
+│   ├── settings.py
+├── assets/
+│   └── (images, polices, etc.)
+├── requirements.txt
+├── README.md
+└── LICENSE
 ```
 
 ---
