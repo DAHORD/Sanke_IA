@@ -1,0 +1,4 @@
+# dossiers ignorées
+__pycache__/*
+model/*
+.vscode/*
