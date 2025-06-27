@@ -28,4 +28,4 @@ LEARNING_RATE = 0.001
 DISCOUNT_FACTOR = 0.9
 
 # NOUVEAU PARAMÈTRE
-TOTAL_GAMES_TO_TRAIN = 5
+TOTAL_GAMES_TO_TRAIN = 1000  # Nombre total de jeux pour l'entraînement de l'IA (main_nb.py)
