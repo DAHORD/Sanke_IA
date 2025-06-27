@@ -1,0 +1,1 @@
+# Ce fichier indique que 'sanke_ia' est un package Python.

@@ -1,9 +1,9 @@
 # snake_project/settings.py
 
 # -- Chemins des ressources --
-FONT_PATH = 'assets/font.ttf'
-FOOD_IMAGE_PATH = 'assets/apple.png'
-MODEL_PATH = 'model/q_table_5.pkl'
+FONT_PATH = '../assets/font.ttf'
+FOOD_IMAGE_PATH = '../assets/apple.png'
+MODEL_PATH = '../model/q_table_5.pkl'
 
 # -- Dimensions de la fenêtre --
 SCREEN_WIDTH = 800
