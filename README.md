@@ -45,8 +45,6 @@
 ```
 > **NB :** Le dossier `model` est indispensable pour le bon fonctionnement de l’IA.
 
-Pour voir la totalité des fichiers et dossiers (notamment si le dossier `snake_ia/` comporte plus de 10 fichiers), consultez la page GitHub du dossier : [Voir snake_ia sur GitHub](https://github.com/DAHORD/Sanke_IA/tree/main/snake_ia)
-
 ---
 
 ## Installation
