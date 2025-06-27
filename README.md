@@ -78,20 +78,22 @@ Affiche graphiquement les parties sauvegardées dans la table `.pkl`.
 
 ```
 Sanke_IA/
-├── __init__.py
-├── main_game.py
-├── main_nb.py
-├── main_while.py
-├── agent.py
-├── games_pkl_ia.py
-├── graphic_pkl_ia.py
-├── game_objects.py
-├── plotter.py
-├── settings.py
-├── assets/
+├── sanke_ia/                # Package principal Python
+│   ├── __init__.py
+│   ├── main_game.py         # Jeu classique
+│   ├── main_nb.py           # Entraînement IA (nombre de parties)
+│   ├── main_while.py        # Entraînement IA (boucle infinie)
+│   ├── agent.py             # Agent Q-Learning
+│   ├── game_objects.py      # Snake, Food, etc.
+│   ├── plotter.py           # Graphiques
+│   ├── settings.py          # Paramètres
+│   ├── games_pkl_ia.py      # Visionnage vidéo des parties de l'IA
+│   └── graphic_pkl_ia.py    # Visionnage graphique des scores de l'IA
+├── assets/                  # Images, sons, polices...
+│   └── ...
 ├── requirements.txt
 ├── README.md
-├── LICENSE
+└── LICENSE
 ```
 
 ---
