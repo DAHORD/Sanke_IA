@@ -3,7 +3,7 @@
 # -- Chemins des ressources --
 FONT_PATH = '../assets/font.ttf'
 FOOD_IMAGE_PATH = '../assets/apple.png'
-MODEL_PATH = '../model/q_table_5.pkl'
+MODEL_PATH = '../model/test_10.pkl'
 
 # -- Dimensions de la fenêtre --
 SCREEN_WIDTH = 800
@@ -28,4 +28,4 @@ LEARNING_RATE = 0.001
 DISCOUNT_FACTOR = 0.9
 
 # NOUVEAU PARAMÈTRE
-TOTAL_GAMES_TO_TRAIN = 1000  # Nombre total de jeux pour l'entraînement de l'IA (main_nb.py)
+TOTAL_GAMES_TO_TRAIN = 10  # Nombre total de jeux pour l'entraînement de l'IA (main_nb.py)

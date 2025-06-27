@@ -104,7 +104,6 @@ def train():
     game = SnakeGameAI()
     plotter = Plotter()
     
-    # MODIFIÉ : La boucle est encapsulée dans un bloc try...finally
     try:
         while agent.n_games < TOTAL_GAMES_TO_TRAIN:
             state_old = agent.get_state(game)
@@ -121,8 +120,8 @@ def train():
                 
                 if score > record:
                     record = score
-                    # La sauvegarde est toujours faite en cas de record
-                    agent.save_model()
+                    # Sauvegarde le modèle, les scores et les scores moyens
+                    agent.save_model(scores=plotter.scores, mean_scores=plotter.mean_scores) # MODIFIÉ
                 
                 print(f'Partie {agent.n_games}/{TOTAL_GAMES_TO_TRAIN}, Score: {score}, Record: {record}, Epsilon: {agent.epsilon:.2f}')
                 plotter.plot(score)
@@ -131,13 +130,11 @@ def train():
         print("\nArrêt manuel détecté. Fin de l'entraînement.")
     
     finally:
-        # Ce bloc s'exécute TOUJOURS : à la fin normale ou en cas d'arrêt manuel.
         print("Sauvegarde finale du modèle en cours...")
-        agent.save_model()
+        # Sauvegarde finale du modèle, scores et scores moyens
+        agent.save_model(scores=plotter.scores, mean_scores=plotter.mean_scores) # MODIFIÉ
         pygame.quit()
         print("Modèle sauvegardé. Programme terminé.")
-
-        # Garde le graphique final affiché
         import matplotlib.pyplot as plt
         plt.ioff()
         plt.show()
