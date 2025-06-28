@@ -1,7 +1,7 @@
 # Snake IA – Jeu Snake avec Intelligence Artificielle (Q-Learning)
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache-2.0-yellow.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](LICENSE)
 
 ## Présentation
 
@@ -41,12 +41,9 @@
 │   ├── plotter.py         # Affichage dynamique des scores pendant l'entraînement
 │   └── settings.py        # Paramètres globaux (jeu, IA, chemins)
 ├── requirements.txt       # Dépendances Python
-├── LICENSE                # Licence Apache 2.0
-└── .gitignore
+└── ...
 ```
 > **NB :** Le dossier `model` est indispensable pour le bon fonctionnement de l’IA.
-
-Pour voir la totalité des fichiers et dossiers (notamment si le dossier `snake_ia/` comporte plus de 10 fichiers), consultez la page GitHub du dossier : [Voir snake_ia sur GitHub](https://github.com/DAHORD/Sanke_IA/tree/main/snake_ia)
 
 ---
 
