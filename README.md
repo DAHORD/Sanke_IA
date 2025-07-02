@@ -158,16 +158,6 @@ pip install -r requirements.txt
 
 ---
 
-## Roadmap
-
-- [ ] Ajout d’une interface web (streamlit)
-- [ ] Support pour d’autres algorithmes (A3C, PPO…)
-- [ ] Tests automatisés et CI/CD
-- [ ] Améliorations graphiques (animations, thèmes)
-- [ ] Documentation technique détaillée
-
----
-
 ## Contribuer
 
 Les contributions sont les bienvenues !  
