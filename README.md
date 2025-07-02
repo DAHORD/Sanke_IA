@@ -1,3 +1,4 @@
+---
 <div align="center">
   
 # 🐍🤖 Snake IA – Jeu Snake avec Intelligence Artificielle (Deep Q-Learning)
@@ -7,6 +8,7 @@
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange.svg)](https://pytorch.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](LICENSE)
+
 
 ---
 
