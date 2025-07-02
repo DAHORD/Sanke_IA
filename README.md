@@ -8,48 +8,73 @@
 
 ## Présentation
 
-**Snake IA** est une version moderne du jeu Snake développée en Python avec [pygame](https://www.pygame.org/), intégrant une intelligence artificielle avancée basée sur le **Deep Q-Learning (DQN)**.
+**Snake IA** est un projet Python qui réinvente le célèbre jeu Snake en y intégrant une intelligence artificielle basée sur le Deep Q-Learning (DQN). Ce projet a pour vocation d’être à la fois un support d’apprentissage pour l’IA de type reinforcement learning et un socle technique robuste pour expérimenter autour de l’automatisation de jeux classiques.
 
 ---
 
-## Fonctionnalités principales
+## Table des matières
 
-- Jeu Snake jouable manuellement avec interface graphique moderne.
-- Entraînement autonome d'une IA via Deep Q-Learning (DQN).
-- Réseau de neurones profond pour la prise de décision, permettant la généralisation.
-- Algorithmes avancés incluant *Experience Replay* et *Double DQN*.
-- Représentation d'état améliorée avec détection de pièges par BFS ("vision stratégique").
-- Sauvegarde automatique du modèle IA (`.pth`) et de l'historique des scores.
-- Visualisation graphique de la progression de l’IA (`plot_dqn_progress.py`).
-- Lecture des parties jouées par le modèle final de l'IA (`play_dqn_game.py`).
-- Arrêt manuel sécurisé pendant l’entraînement avec sauvegarde garantie.
-- Structure de projet claire pour une prise en main rapide.
+- [Fonctionnalités](#fonctionnalités)
+- [Aperçu visuel](#aperçu-visuel)
+- [Architecture du projet](#architecture-du-projet)
+- [Installation](#installation)
+- [Utilisation](#utilisation)
+- [Configuration & Personnalisation](#configuration--personnalisation)
+- [Dépendances](#dépendances)
+- [Tests & Qualité](#tests--qualité)
+- [Roadmap](#roadmap)
+- [Contribuer](#contribuer)
+- [Licence](#licence)
+- [Contact](#contact)
 
 ---
 
-## Structure du projet
+## Fonctionnalités
+
+- 🎮 Jeu Snake jouable manuellement avec interface graphique moderne (pygame)
+- 🤖 Intelligence Artificielle basée sur Deep Q-Learning (DQN)
+- 🧠 Réseau de neurones profond pour la prise de décision
+- 🌱 Algorithmes avancés : Experience Replay, Double DQN, détection de pièges par BFS
+- 💾 Sauvegarde automatique du modèle IA et de l’historique des scores
+- 📊 Visualisation graphique de la progression de l’IA
+- ▶️ Lecture des parties jouées par le modèle final
+- 🛑 Arrêt sécurisé pendant l’entraînement avec sauvegarde garantie
+- 🗂️ Structure modulaire et claire du projet
+
+---
+
+## Aperçu visuel
+
+<p align="center">
+  <img src="assets/snake_demo.gif" alt="Aperçu du jeu Snake IA" width="500"/>
+</p>
+
+---
+
+## Architecture du projet
 
 ```text
 .
-├── assets/                # Ressources graphiques (pomme, police)
+├── assets/                # Ressources graphiques (pomme, police, gifs)
 │   ├── apple.png
-│   └── font.ttf
+│   ├── font.ttf
+│   └── snake_demo.gif
 ├── model/                 # Modèles IA sauvegardés (.pth)
 ├── snake_ia/              # Code source principal
 │   ├── __init__.py
 │   ├── agent.py           # Logique Deep Q-Learning (Agent DQN)
 │   ├── game_objects.py    # Classes Snake et Food
-│   ├── model.py           # Architecture du réseau de neurones et Trainer
+│   ├── model.py           # Architecture du réseau de neurones & Trainer
 │   ├── plot_dqn_progress.py # Visualisation graphique des scores
 │   ├── play_dqn_game.py   # Lecture des parties de l'IA finale
-│   ├── main_nb.py         # Entraînement IA (nombre de parties défini)
+│   ├── main_nb.py         # Entraînement IA (nombre de parties donné)
 │   ├── main_while.py      # Entraînement IA (boucle infinie)
 │   ├── plotter.py         # Affichage dynamique des scores
 │   └── settings.py        # Paramètres globaux (jeu, IA, chemins)
 ├── requirements.txt       # Dépendances Python
 └── README.md
 ```
-> **NB :** Le dossier `model` est indispensable pour le bon fonctionnement de l’IA.
+> **Remarque :** Le dossier `model/` est indispensable pour le bon fonctionnement de l’IA.
 
 ---
 
@@ -60,6 +85,7 @@
     git clone https://github.com/DAHORD/Snake_IA.git
     cd Snake_IA
     ```
+
 2. **Installer les dépendances**
     ```sh
     pip install -r requirements.txt
@@ -69,51 +95,76 @@
 
 ## Utilisation
 
-### 1. Entraîner l’IA
+### 1. Lancer l'entraînement de l’IA
 
-Lancer l'entraînement en boucle infinie (recommandé pour atteindre de hauts scores) :
+Pour entraîner l’IA en boucle infinie :
 ```sh
 python snake_ia/main_while.py
 ```
-- Arrêtez l'entraînement à tout moment via la croix de la fenêtre ou Ctrl+C.
-- Le modèle et l'historique des scores sont sauvegardés automatiquement à l'arrêt.
+> Arrêtez l'entraînement à tout moment via la croix de la fenêtre ou Ctrl+C.  
+> Le modèle et l'historique des scores sont sauvegardés automatiquement.
 
 ### 2. Visualiser la progression de l’IA
 
-Affichez le graphique des scores à partir du dernier modèle sauvegardé :
+Pour afficher le graphique des scores :
 ```sh
 python snake_ia/plot_dqn_progress.py
 ```
 
 ### 3. Regarder l'IA jouer
 
-Lancez une démonstration pour regarder le meilleur modèle jouer :
+Pour lancer une démonstration :
 ```sh
-# Lance 5 parties de démonstration
 python snake_ia/play_dqn_game.py --games 5
 ```
 - `--games` : nombre de parties à jouer (défaut : 3).
 
 ---
 
-## Personnalisation & Configuration
+## Configuration & Personnalisation
 
-- **Paramètres du jeu et de l’IA** : modifiez `snake_ia/settings.py` pour changer le `LEARNING_RATE`, `DISCOUNT_FACTOR`, la taille du réseau (`HIDDEN_LAYER_SIZE`), etc.
+- **Paramètres du jeu et de l’IA** : modifiez `snake_ia/settings.py` (ex : `LEARNING_RATE`, `DISCOUNT_FACTOR`, `HIDDEN_LAYER_SIZE`, etc.).
 - **Chemins des ressources** : adaptez `FONT_PATH`, `FOOD_IMAGE_PATH`, `MODEL_PATH` si besoin.
+- **Visualisation** : le fichier `plot_dqn_progress.py` permet de suivre l’évolution des performances de l’IA au fil du temps.
 
 ---
 
 ## Dépendances
 
+- Python 3.8+
 - pygame
 - numpy
 - matplotlib
 - torch
 
-Installez-les rapidement avec :
+Installation rapide :
 ```sh
 pip install -r requirements.txt
 ```
+
+---
+
+## Tests & Qualité
+
+- Des tests unitaires peuvent être ajoutés dans un dossier `tests/` pour garantir la robustesse du code.
+- Suivi des performances et log des scores via les scripts fournis.
+
+---
+
+## Roadmap
+
+- [ ] Ajout d’une interface web (streamlit)
+- [ ] Support pour d’autres algorithmes (A3C, PPO…)
+- [ ] Tests automatisés et CI/CD
+- [ ] Améliorations graphiques (animations, thèmes)
+- [ ] Documentation technique détaillée
+
+---
+
+## Contribuer
+
+Les contributions sont les bienvenues !  
+Pour proposer une amélioration, ouvrez une [issue](https://github.com/DAHORD/Snake_IA/issues) ou une [pull request](https://github.com/DAHORD/Snake_IA/pulls).
 
 ---
 
@@ -123,16 +174,15 @@ Projet sous licence [Apache 2.0](LICENSE).
 
 ---
 
-## Auteur
+## Contact
 
-- [DAHORD](https://github.com/DAHORD)
-
----
-
-## Contribution & Support
-
-Pour toute question, suggestion ou amélioration, n'hésitez pas à ouvrir une issue ou une pull request. Toute contribution est la bienvenue !
+Créé par [DAHORD](https://github.com/DAHORD)  
+Pour toute question ou suggestion : ouvrez une issue ou contactez-moi sur GitHub.
 
 ---
 
-Bon jeu et bon apprentissage avec Snake IA ! 🐍🤖
+<div align="center">
+
+**Bon jeu et bon apprentissage avec Snake IA ! 🐍🤖**
+
+</div>
