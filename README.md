@@ -26,3 +26,107 @@
 ---
 
 ## Structure du projet
+
+.
+├── assets/                # Ressources graphiques (pomme, police)
+│   ├── apple.png
+│   └── font.ttf
+├── model/                 # Modèles IA sauvegardés (.pth)
+├── snake_ia/              # Code source principal
+│   ├── init.py
+│   ├── agent.py           # Logique Deep Q-Learning (Agent DQN)
+│   ├── game_objects.py    # Classes Snake et Food
+│   ├── model.py           # Architecture du réseau de neurones et Trainer
+│   ├── plot_dqn_progress.py # Visualisation graphique des scores
+│   ├── play_dqn_game.py   # Lecture des parties de l'IA finale
+│   ├── main_nb.py         # Entraînement IA (nombre de parties défini)
+│   ├── main_while.py      # Entraînement IA (boucle infinie)
+│   ├── plotter.py         # Affichage dynamique des scores
+│   └── settings.py        # Paramètres globaux (jeu, IA, chemins)
+├── requirements.txt       # Dépendances Python
+└── README.md
+
+
+> **NB :** Le dossier `model` est indispensable pour le bon fonctionnement de l’IA.
+
+---
+
+## Installation
+
+1.  **Cloner le dépôt**
+    ```sh
+    git clone [https://github.com/DAHORD/Sanke_IA.git](https://github.com/DAHORD/Sanke_IA.git)
+    cd Sanke_IA
+    ```
+
+2.  **Installer les dépendances**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+---
+
+## Utilisation
+
+### 1. Entraîner l’IA
+
+Lancer l'entraînement en boucle infinie (recommandé pour atteindre de hauts scores).
+
+```sh
+python snake_ia/main_while.py
+
+    Arrêtez l'entraînement à tout moment via la croix de la fenêtre ou Ctrl+C.
+
+    Le modèle et l'historique des scores sont sauvegardés automatiquement à l'arrêt.
+
+2. Visualiser la progression de l’IA
+
+Affichez le graphique des scores à partir du dernier modèle sauvegardé.
+Bash
+
+python snake_ia/plot_dqn_progress.py
+
+3. Regarder l'IA Jouer
+
+Lancez une démonstration pour regarder le meilleur modèle jouer.
+Bash
+
+# Lance 5 parties de démonstration
+python snake_ia/play_dqn_game.py --games 5
+
+    --games : nombre de parties à jouer (défaut : 3).
+
+Personnalisation & Configuration
+
+    Paramètres du jeu et de l’IA : modifiez snake_ia/settings.py pour changer le LEARNING_RATE, DISCOUNT_FACTOR, la taille du réseau (HIDDEN_LAYER_SIZE), etc.
+
+    Chemins des ressources : adaptez FONT_PATH, FOOD_IMAGE_PATH, MODEL_PATH si besoin.
+
+Dépendances
+
+    pygame
+
+    numpy
+
+    matplotlib
+
+    torch
+
+Installez-les rapidement avec :
+Bash
+
+pip install -r requirements.txt
+
+Licence
+
+Projet sous licence Apache 2.0.
+
+Auteur
+
+    DAHORD
+
+Contribution & Support
+
+Pour toute question, suggestion ou amélioration, n'hésitez pas à ouvrir une issue ou une pull request. Toute contribution est la bienvenue !
+
+Bon jeu et bon apprentissage avec Snake IA ! 🐍🤖
