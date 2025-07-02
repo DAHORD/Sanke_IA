@@ -108,7 +108,7 @@ python snake_ia/main_while.py
 ```sh
 python snake_ia/main_nb.py
 ```
-- Le nombre de parties à jouer est paramétrable dans `snake_ia/settings.py` (variable `NB_GAMES` par exemple).
+- Le nombre de parties à jouer est paramétrable dans `snake_ia/settings.py` (variable `TOTAL_GAMES_TO_TRAIN`).
 - Pratique pour des tests, benchmarks ou pour limiter la durée d’apprentissage.
 
 ### 2. Visualiser la progression de l’IA
@@ -130,9 +130,9 @@ python snake_ia/play_dqn_game.py --games 5
 
 ## Configuration & Personnalisation
 
-- **Paramètres du jeu et de l’IA** : modifiez `snake_ia/settings.py` (`LEARNING_RATE`, `DISCOUNT_FACTOR`, `HIDDEN_LAYER_SIZE`, `NB_GAMES`, etc.).
+- **Paramètres du jeu et de l’IA** : modifiez `snake_ia/settings.py` (`LEARNING_RATE`, `DISCOUNT_FACTOR`, `HIDDEN_LAYER_SIZE`, `TOTAL_GAMES_TO_TRAIN`, etc.).
 - **Chemins des ressources** : adaptez `FONT_PATH`, `FOOD_IMAGE_PATH`, `MODEL_PATH` si besoin.
-- **Visualisation** : le fichier `plot_dqn_progress.py` permet de suivre l’évolution des performances de l’IA au fil du temps.
+- **Visualisation** : les fichiers `plot_dqn_progress.py` et `play_dqn_game.py` permettent de de suivre et voir l’évolution des performances de l’IA au fil du temps, une fois le ou les entrainement(s) terminé(s).
 
 ---
 
