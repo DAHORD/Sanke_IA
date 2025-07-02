@@ -1,154 +1,118 @@
 # snake_project/agent.py
 
+import torch
 import random
 import numpy as np
-import pickle
-import os
-import pygame
 from collections import deque
-from settings import (BLOCK_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, MAX_MEMORY, 
-                      BATCH_SIZE, LEARNING_RATE, DISCOUNT_FACTOR, MODEL_PATH)
+import os
+from settings import *
+from model import Linear_QNet, QTrainer
+
+# On passe à un état plus complexe
+STATE_SIZE = 14
+ACTION_SIZE = 3
 
 class Agent:
     def __init__(self, load_model=True):
         self.n_games = 0
+        self.epsilon = 0
+        self.scores_history = []
+        self.mean_scores_history = []
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.gamma = DISCOUNT_FACTOR
-        self.epsilon = 1.0 
-        self.q_table = {}
-        self.scores_history = []  # Nouveau: pour stocker l'historique des scores par partie
-        self.mean_scores_history = [] # Nouveau: pour stocker l'historique des scores moyens
+        
+        self.model = Linear_QNet(STATE_SIZE, HIDDEN_LAYER_SIZE, ACTION_SIZE)
+        self.target_model = Linear_QNet(STATE_SIZE, HIDDEN_LAYER_SIZE, ACTION_SIZE)
+        
+        self.trainer = QTrainer(self.model, self.target_model, lr=LEARNING_RATE, gamma=DISCOUNT_FACTOR)
+
         if load_model:
             self.load_model()
+            self.target_model.load_state_dict(self.model.state_dict())
+        
+        self.target_model.eval()
+
+    def find_safe_path_bfs(self, game, start_pos):
+        q = deque([start_pos])
+        visited = {start_pos}
+        count = 0
+        while q:
+            count += 1
+            # Si on trouve un espace suffisamment grand, on considère le chemin sûr
+            if count > len(game.snake.body) + 2:
+                return True
+            x, y = q.popleft()
+            for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                next_pos = (x + dx * BLOCK_SIZE, y + dy * BLOCK_SIZE)
+                if next_pos not in visited and not game._is_collision(next_pos):
+                    visited.add(next_pos)
+                    q.append(next_pos)
+        return False
 
     def get_state(self, game):
         head = game.snake.body[0]
-        
-        point_l = (head.x - BLOCK_SIZE, head.y)
-        point_r = (head.x + BLOCK_SIZE, head.y)
-        point_u = (head.x, head.y - BLOCK_SIZE)
-        point_d = (head.x, head.y + BLOCK_SIZE)
-        
-        dir_l = game.snake.direction.x == -1
-        dir_r = game.snake.direction.x == 1
-        dir_u = game.snake.direction.y == -1
-        dir_d = game.snake.direction.y == 1
+        point_l = (head.x - BLOCK_SIZE, head.y); point_r = (head.x + BLOCK_SIZE, head.y)
+        point_u = (head.x, head.y - BLOCK_SIZE); point_d = (head.x, head.y + BLOCK_SIZE)
+        dir_l = game.snake.direction.x == -1; dir_r = game.snake.direction.x == 1
+        dir_u = game.snake.direction.y == -1; dir_d = game.snake.direction.y == 1
+
+        # Mouvements relatifs
+        dir_vec = game.snake.direction
+        move_straight = (head.x + dir_vec.x * BLOCK_SIZE, head.y + dir_vec.y * BLOCK_SIZE)
+        move_right = (head.x + dir_vec.y * BLOCK_SIZE, head.y - dir_vec.x * BLOCK_SIZE)
+        move_left = (head.x - dir_vec.y * BLOCK_SIZE, head.y + dir_vec.x * BLOCK_SIZE)
 
         state = [
-            # Danger droit devant
-            (dir_r and self._is_collision(point_r, game.snake.body)) or 
-            (dir_l and self._is_collision(point_l, game.snake.body)) or 
-            (dir_u and self._is_collision(point_u, game.snake.body)) or 
-            (dir_d and self._is_collision(point_d, game.snake.body)),
-
-            # Danger à droite (en tournant)
-            (dir_u and self._is_collision(point_r, game.snake.body)) or # Si va vers le haut et qu'à droite il y a danger (droite du serpent)
-            (dir_d and self._is_collision(point_l, game.snake.body)) or # Si va vers le bas et qu'à gauche il y a danger (gauche du serpent)
-            (dir_l and self._is_collision(point_u, game.snake.body)) or # Si va vers la gauche et qu'en haut il y a danger (haut du serpent)
-            (dir_r and self._is_collision(point_d, game.snake.body)), # Si va vers la droite et qu'en bas il y a danger (bas du serpent)
-            
-            # Danger à gauche (en tournant)
-            (dir_d and self._is_collision(point_r, game.snake.body)) or # Si va vers le bas et qu'à droite il y a danger (droite du serpent)
-            (dir_u and self._is_collision(point_l, game.snake.body)) or # Si va vers le haut et qu'à gauche il y a danger (gauche du serpent)
-            (dir_r and self._is_collision(point_u, game.snake.body)) or # Si va vers la droite et qu'en haut il y a danger (haut du serpent)
-            (dir_l and self._is_collision(point_d, game.snake.body)), # Si va vers la gauche et qu'en bas il y a danger (bas du serpent)
-            
-            # Direction actuelle
+            # Dangers immédiats
+            (dir_r and game._is_collision(point_r)) or (dir_l and game._is_collision(point_l)) or (dir_u and game._is_collision(point_u)) or (dir_d and game._is_collision(point_d)),
+            (dir_u and game._is_collision(point_r)) or (dir_d and game._is_collision(point_l)) or (dir_l and game._is_collision(point_u)) or (dir_r and game._is_collision(point_d)),
+            (dir_d and game._is_collision(point_r)) or (dir_u and game._is_collision(point_l)) or (dir_r and game._is_collision(point_u)) or (dir_l and game._is_collision(point_d)),
+            # Direction du mouvement
             dir_l, dir_r, dir_u, dir_d,
-            
-            # Position de la nourriture relative à la tête
-            game.food.pos.x < head.x, # Nourriture à gauche
-            game.food.pos.x > head.x, # Nourriture à droite
-            game.food.pos.y < head.y, # Nourriture en haut
-            game.food.pos.y > head.y  # Nourriture en bas
+            # Position de la nourriture
+            game.food.pos.x < head.x, game.food.pos.x > head.x,
+            game.food.pos.y < head.y, game.food.pos.y > head.y,
+            # Vision stratégique (détection de pièges)
+            not self.find_safe_path_bfs(game, move_straight),
+            not self.find_safe_path_bfs(game, move_right),
+            not self.find_safe_path_bfs(game, move_left),
         ]
-        return tuple(state)
-
-    def _is_collision(self, pt, snake_body):
-        # Vérifie la collision avec les bords de l'écran
-        if pt[0] >= SCREEN_WIDTH or pt[0] < 0 or pt[1] >= SCREEN_HEIGHT or pt[1] < 0:
-            return True
-        # Vérifie la collision avec le corps du serpent
-        test_rect = pygame.Rect(pt[0], pt[1], BLOCK_SIZE, BLOCK_SIZE)
-        # On ne teste pas la collision avec la tête elle-même, seulement le reste du corps
-        if any(segment.colliderect(test_rect) for segment in snake_body):
-            return True
-        return False
+        return np.array(state, dtype=int)
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
 
     def train_long_memory(self):
-        if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE)
-        else:
-            mini_sample = self.memory
-        
-        # Le déploiement du mini_sample ici est plus clair
-        for state, action, reward, next_state, done in mini_sample:
-            self.train_short_memory(state, action, reward, next_state, done)
+        if len(self.memory) > BATCH_SIZE: mini_sample = random.sample(self.memory, BATCH_SIZE)
+        else: mini_sample = self.memory
+        states, actions, rewards, next_states, dones = zip(*mini_sample)
+        self.trainer.train_step(np.array(states), np.array(actions), np.array(rewards), np.array(next_states), np.array(dones))
 
     def train_short_memory(self, state, action, reward, next_state, done):
-        # Utilise .get() pour gérer les états non encore présents dans la q_table
-        q_values = list(self.q_table.get(state, [0.0, 0.0, 0.0])) # S'assure que les valeurs sont float
-        target = reward
-        if not done:
-            next_q_values = self.q_table.get(next_state, [0.0, 0.0, 0.0]) # S'assure que les valeurs sont float
-            target = reward + self.gamma * np.max(next_q_values)
-        
-        action_index = np.argmax(action)
-        q_values[action_index] = (1 - LEARNING_RATE) * q_values[action_index] + LEARNING_RATE * target
-        self.q_table[state] = tuple(q_values)
+        self.trainer.train_step(state, action, reward, next_state, done)
 
-    def get_action(self, state):
-        # --- STRATÉGIE D'EPSILON AMÉLIORÉE ---
-        # Epsilon va maintenant décroître plus lentement, avec un minimum.
-        # Après 500 parties, le taux d'exploration sera d'environ 5%.
-        # Vous pouvez ajuster le "500" pour une exploration plus ou moins longue.
-        exploration_rate = 1 - (self.n_games / 500)
-        self.epsilon = max(0.05, exploration_rate) # Taux d'exploration minimum de 5%
-
-        final_move = [0, 0, 0] # [tout droit, droite, gauche]
-        if random.uniform(0, 1) < self.epsilon:
-            move_index = random.randint(0, 2) # Action aléatoire (exploration)
+    def get_action(self, state, is_playing=False):
+        self.epsilon = 80 - self.n_games
+        final_move = [0, 0, 0]
+        if is_playing or random.randint(0, 200) < self.epsilon:
+            move_index = random.randint(0, 2)
         else:
-            q_values = self.q_table.get(state, [0.0, 0.0, 0.0]) # Valeurs par défaut si l'état n'existe pas
-            move_index = np.argmax(q_values) # Meilleure action connue (exploitation)
-        
+            state0 = torch.tensor(state, dtype=torch.float)
+            prediction = self.model(state0)
+            move_index = torch.argmax(prediction).item()
         final_move[move_index] = 1
         return final_move
-        
+
     def save_model(self, scores=None, mean_scores=None):
-        # Utilise les scores et mean_scores passés en paramètre si disponibles,
-        # sinon utilise les attributs de l'agent (mis à jour à chaque appel de plot)
-        data_to_save = {
-            'n_games': self.n_games,
-            'q_table': self.q_table,
-            'scores_history': scores if scores is not None else self.scores_history,
-            'mean_scores_history': mean_scores if mean_scores is not None else self.mean_scores_history
-        }
-        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True) # S'assure que le répertoire existe
-        with open(MODEL_PATH, 'wb') as f:
-            pickle.dump(data_to_save, f)
-        # print(f"Modèle sauvegardé dans {MODEL_PATH}") # Peut être utile pour le débogage
+        data_to_save = {'model_state_dict': self.model.state_dict(), 'n_games': self.n_games, 'scores_history': scores, 'mean_scores_history': mean_scores}
+        self.model.save(data_to_save)
 
     def load_model(self):
-        if os.path.exists(MODEL_PATH):
-            try:
-                with open(MODEL_PATH, 'rb') as f:
-                    data = pickle.load(f)
-                    self.n_games = data.get('n_games', 0)
-                    self.q_table = data.get('q_table', {})
-                    # Charge l'historique des scores, avec une valeur par défaut vide si non présent
-                    self.scores_history = data.get('scores_history', []) 
-                    self.mean_scores_history = data.get('mean_scores_history', []) 
-                    print(f"Modèle chargé : {self.n_games} parties déjà jouées. Q-table contient {len(self.q_table)} états.")
-            except (EOFError, pickle.UnpicklingError) as e:
-                print(f"Erreur lors du chargement du modèle {MODEL_PATH}: {e}. Le fichier est peut-être corrompu ou vide. Initialisation d'un nouveau modèle.")
-                # Réinitialiser les attributs si le chargement échoue
-                self.n_games = 0
-                self.q_table = {}
-                self.scores_history = []
-                self.mean_scores_history = []
-        else:
-            print(f"Aucun modèle trouvé à {MODEL_PATH}. Démarrage d'un nouvel entraînement.")
+        if not os.path.exists(MODEL_PATH): print("Aucun modèle trouvé."); return
+        try:
+            data = torch.load(MODEL_PATH)
+            self.model.load_state_dict(data['model_state_dict'])
+            self.n_games = data.get('n_games', 0)
+            self.scores_history = data.get('scores_history', [])
+            self.mean_scores_history = data.get('mean_scores_history', [])
+            print(f"Modèle chargé : {self.n_games} parties déjà jouées.")
+        except Exception as e: print(f"Erreur lors du chargement du modèle : {e}.")

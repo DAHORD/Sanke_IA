@@ -2,3 +2,7 @@ pygame>=2.0.0
 numpy
 matplotlib
 pandas
+torch>=1.7.0
+torchvision
+tqdm
+scikit-learn

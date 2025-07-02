@@ -1,4 +1,4 @@
-# snake_project/main.py
+# snake_project/main_while.py (CORRIGÉ)
 
 import pygame
 import sys
@@ -15,7 +15,7 @@ class SnakeGameAI:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("IA Snake")
+        pygame.display.set_caption("IA Snake - DQN (Stable)")
         self.clock = pygame.time.Clock()
         try:
             self.font = pygame.font.Font(FONT_PATH, 24)
@@ -32,79 +32,73 @@ class SnakeGameAI:
     def play_step(self, action):
         self.frame_iteration += 1
         for event in pygame.event.get():
-            # MODIFIÉ : On ne quitte plus brutalement. On lève notre exception.
             if event.type == pygame.QUIT:
                 raise QuitTraining()
-        
-        distance_avant = pygame.math.Vector2(self.snake.body[0].center).distance_to(self.food.pos.center)
-
         self._move(action)
         self.snake.move()
         
-        distance_apres = pygame.math.Vector2(self.snake.body[0].center).distance_to(self.food.pos.center)
-        
         game_over = False
-        reward = 0
-        
-        if distance_apres < distance_avant:
-            reward = 0.1
-        else:
-            reward = -0.2
-
-        if self.frame_iteration > 150 * (len(self.snake.body)):
-            game_over = True
-            reward = -10
-        
-        if self.snake.body[0].colliderect(self.food.pos):
-            self.score += 1
-            reward = 10 
-            self.snake.grow_snake()
-            self.food.randomize_position(self.snake.body)
-            self.frame_iteration = 0
+        # Récompense simple et claire
+        reward = 0 
         
         if self._is_collision():
             game_over = True
             reward = -10
+            return reward, game_over, self.score
             
+        if self.snake.body[0].colliderect(self.food.pos):
+            self.score += 1
+            reward = 10 # Récompense fixe et forte
+            self.snake.grow_snake()
+            self.food.randomize_position(self.snake.body)
+            self.frame_iteration = 0
+            
+        # Pénalité si l'IA tourne en rond trop longtemps
+        if self.frame_iteration > 100 * (len(self.snake.body) + 1):
+             game_over = True
+             reward = -10
+
         self._update_ui()
         self.clock.tick(SNAKE_SPEED)
         return reward, game_over, self.score
 
-    def _is_collision(self):
-        head = self.snake.body[0]
-        if not (0 <= head.left < SCREEN_WIDTH and 0 <= head.top < SCREEN_HEIGHT):
-            return True
-        if self.snake.check_collision():
-            return True
+    def _is_collision(self, pt=None):
+        if pt is None: pt_rect = self.snake.body[0]
+        else: pt_rect = pygame.Rect(pt[0], pt[1], BLOCK_SIZE, BLOCK_SIZE)
+        if pt_rect.left < 0 or pt_rect.right > SCREEN_WIDTH or pt_rect.top < 0 or pt_rect.bottom > SCREEN_HEIGHT: return True
+        if pt is None and self.snake.check_collision(): return True
+        if pt is not None and any(segment.colliderect(pt_rect) for segment in self.snake.body): return True
         return False
 
     def _move(self, action):
         clock_wise = [self.snake.direction, pygame.math.Vector2(self.snake.direction.y, -self.snake.direction.x), pygame.math.Vector2(-self.snake.direction.y, self.snake.direction.x)]
         idx = np.argmax(action)
-        new_dir = clock_wise[idx]
-        self.snake.change_direction(new_dir)
+        self.snake.change_direction(clock_wise[idx])
 
     def _update_ui(self):
         self.screen.fill(BACKGROUND_COLOR)
         self._draw_grid()
-        self.snake.draw(self.screen)
-        self.food.draw(self.screen)
+        self.snake.draw(self.screen); self.food.draw(self.screen)
         score_text = self.font.render(f"Score: {self.score}", True, (248, 248, 242))
         self.screen.blit(score_text, (10, 10))
         pygame.display.flip()
 
     def _draw_grid(self):
-        for x in range(0, SCREEN_WIDTH, BLOCK_SIZE):
-            pygame.draw.line(self.screen, GRID_COLOR, (x, 0), (x, SCREEN_HEIGHT))
-        for y in range(0, SCREEN_HEIGHT, BLOCK_SIZE):
-            pygame.draw.line(self.screen, GRID_COLOR, (0, y), (SCREEN_WIDTH, y))
+        for x in range(0, SCREEN_WIDTH, BLOCK_SIZE): pygame.draw.line(self.screen, GRID_COLOR, (x, 0), (x, SCREEN_HEIGHT))
+        for y in range(0, SCREEN_HEIGHT, BLOCK_SIZE): pygame.draw.line(self.screen, GRID_COLOR, (0, y), (SCREEN_WIDTH, y))
 
 def train():
-    record = 0
     agent = Agent()
-    game = SnakeGameAI()
     plotter = Plotter()
-
+    if agent.scores_history:
+        plotter.scores = agent.scores_history; plotter.mean_scores = agent.mean_scores_history
+        plotter.total_score = sum(agent.scores_history)
+        record = max(agent.scores_history) if agent.scores_history else 0
+        print(f"Reprise de l'entraînement. Record précédent : {record}")
+    else: record = 0
+    
+    game = SnakeGameAI()
+    
     try:
         while True:
             state_old = agent.get_state(game)
@@ -118,26 +112,24 @@ def train():
                 game.reset()
                 agent.n_games += 1
                 agent.train_long_memory()
-                
-                if score > record:
-                    record = score
-                    # La sauvegarde est toujours faite en cas de record
-                    agent.save_model()
-                
-                print(f'Partie {agent.n_games}, Score: {score}, Record: {record}, Epsilon: {agent.epsilon:.2f}')
-                plotter.plot(score)
-    
-    except QuitTraining:
-        print("\nArrêt manuel détecté. Fin de l'entraînement.")
-    
-    finally:
-        # Ce bloc s'exécute TOUJOURS : à la fin normale ou en cas d'arrêt manuel.
-        print("Sauvegarde finale du modèle en cours...")
-        agent.save_model()
-        pygame.quit()
-        print("Modèle sauvegardé. Programme terminé.")
 
-        # Garde le graphique final affiché
+                # Mise à jour du réseau cible (target network) toutes les C parties
+                if agent.n_games % 10 == 0:
+                    agent.target_model.load_state_dict(agent.model.state_dict())
+                    print("Réseau cible mis à jour.")
+
+                if score > record: record = score
+                
+                plotter.plot(score)
+                print(f'Partie {agent.n_games}, Score: {score}, Record: {record}, Epsilon: {max(0, 80 - agent.n_games)}')
+                agent.save_model(scores=plotter.scores, mean_scores=plotter.mean_scores)
+    
+    except QuitTraining: print("\nArrêt manuel détecté.")
+    finally:
+        print("Sauvegarde finale...")
+        agent.save_model(scores=plotter.scores, mean_scores=plotter.mean_scores)
+        pygame.quit()
+        print("Modèle sauvegardé.")
         import matplotlib.pyplot as plt
         plt.ioff()
         plt.show()

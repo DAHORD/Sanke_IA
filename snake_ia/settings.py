@@ -3,7 +3,7 @@
 # -- Chemins des ressources --
 FONT_PATH = '../assets/font.ttf'
 FOOD_IMAGE_PATH = '../assets/apple.png'
-MODEL_PATH = '../model/test_10.pkl'
+MODEL_PATH = '../model/model_db_q.pth' 
 
 # -- Dimensions de la fenêtre --
 SCREEN_WIDTH = 800
@@ -19,13 +19,15 @@ EYE_COLOR = (255, 255, 255)
 RED = (255, 85, 85)
 
 # -- Paramètres du jeu --
-SNAKE_SPEED = 20  # Vitesse du jeu (plus élevé = plus rapide)
+SNAKE_SPEED = 1000
 
-# -- Paramètres de l'IA (Q-Learning) --
-MAX_MEMORY = 100_000
+# -- Paramètres du Deep Q-Learning (RÉGLÉS POUR LA STABILITÉ) --
+HIDDEN_LAYER_SIZE = 256
+MAX_MEMORY = 100_000   # Une mémoire un peu plus petite peut aider au début
 BATCH_SIZE = 1000
+# MODIFIÉ : Taux d'apprentissage plus faible et plus sûr
 LEARNING_RATE = 0.001
 DISCOUNT_FACTOR = 0.9
 
-# NOUVEAU PARAMÈTRE
-TOTAL_GAMES_TO_TRAIN = 10  # Nombre total de jeux pour l'entraînement de l'IA (main_nb.py)
+# -- Paramètre pour la version avec un nombre de parties défini --
+TOTAL_GAMES_TO_TRAIN = 200
