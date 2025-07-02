@@ -187,9 +187,3 @@ Créé par [DAHORD](https://github.com/DAHORD)
 Pour toute question ou suggestion : ouvrez une issue ou contactez-moi sur GitHub.
 
 ---
-
-<div align="center">
-
-**Bon jeu et bon apprentissage avec Snake IA ! 🐍🤖**
-
-</div>
